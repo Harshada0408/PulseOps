@@ -1,0 +1,44 @@
+{
+  "name": "pulseops",
+  "version": "1.0.0",
+  "description": "PulseOps: API monitoring, latency analytics and evidence-driven incident investigation. Built on the MIT-licensed open-source api-monitor-saas (Next.js + Express + PostgreSQL).",
+  "private": true,
+  "workspaces": [
+    "core",
+    "frontend",
+    "backend",
+    "worker"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\" \"npm run dev:worker\"",
+    "dev:frontend": "npm run dev -w frontend",
+    "dev:backend": "npm run dev -w backend",
+    "dev:worker": "npm run dev -w worker",
+    "build": "npm run build -w core && npm run build -w backend && npm run build -w worker && npm run build -w frontend",
+    "build:frontend": "npm run build -w frontend",
+    "build:backend": "npm run build -w backend",
+    "build:worker": "npm run build -w worker",
+    "start": "npm run start -w backend",
+    "db:studio": "node scripts/prisma-cli.js studio",
+    "db:generate": "node scripts/prisma-cli.js generate",
+    "test": "npm run test -w core && npm run test -w backend && npm run test -w worker",
+    "test:backend": "npm run test -w backend",
+    "test:worker": "npm run test -w worker",
+    "lint": "npm run lint -w core && npm run lint -w backend && npm run lint -w worker",
+    "typecheck": "npm run build -w core && npm run typecheck -w core && npm run typecheck -w backend && npm run typecheck -w worker && npm run typecheck -w frontend",
+    "licenses": "node scripts/audit-licenses.js",
+    "licenses:check": "node scripts/audit-licenses.js --check",
+    "predev": "npm run build -w core",
+    "setup:env": "node scripts/setup-env.js",
+    "db:deploy": "node scripts/prisma-cli.js migrate deploy",
+    "test:core": "npm run test -w core",
+    "dev:core": "tsc -p core/tsconfig.build.json --watch",
+    "db:status": "node scripts/prisma-cli.js migrate status"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}

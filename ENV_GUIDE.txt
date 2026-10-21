@@ -1,0 +1,127 @@
+# Where to get each .env value
+
+```
+cp .env.example .env
+```
+
+Only three values are required to run locally: `SUPABASE_URL`,
+`SUPABASE_ANON_KEY`, and `SUPABASE_SERVICE_ROLE_KEY`. Everything else has a
+working default or is feature-gated off.
+
+---
+
+## Required
+
+### Supabase
+
+<https://supabase.com/dashboard> — create a free project
+
+| Value | Where to find it |
+|---|---|
+| `SUPABASE_URL` | Project → Settings → API → Project URL |
+| `SUPABASE_ANON_KEY` | Project → Settings → API → anon public key |
+| `SUPABASE_SERVICE_ROLE_KEY` | Project → Settings → API → service_role key |
+
+The service-role key grants full administrative access to the auth schema. The
+backend needs it to verify tokens. It must never reach a browser or be committed.
+
+Authentication is delegated to Supabase in this edition, so a fully offline
+install is not currently possible. That limitation is tracked in
+[ROADMAP.md](ROADMAP.md) (P2) and the replacement is designed in
+[docs/AUTH_DESIGN.md](docs/AUTH_DESIGN.md).
+
+---
+
+## Optional
+
+### Stripe
+
+<https://dashboard.stripe.com> — only needed when `ENABLE_BILLING=true`
+
+| Value | Where to find it |
+|---|---|
+| `STRIPE_SECRET_KEY` | Developers → API keys |
+| `STRIPE_WEBHOOK_SECRET` | Developers → Webhooks → add endpoint for `/api/v1/billing/webhook` |
+| `STRIPE_PRICE_BASIC`, `STRIPE_PRICE_PRO` | Products → create product → copy price ID |
+
+Use test keys first. The backend implements checkout, the billing portal, and
+webhook handling; the dashboard does not yet complete a purchase, and plan limits
+are advisory rather than enforced.
+
+### Resend
+
+<https://resend.com> — only needed when `ENABLE_EMAILS=true`
+
+| Value | Where to find it |
+|---|---|
+| `RESEND_API_KEY` | API Keys → Create |
+| `FROM_EMAIL` | Domains → add and verify, then use a verified address |
+
+Also used as the Supabase SMTP sender for verification and password-reset emails.
+
+---
+
+## Generate a JWT secret
+
+```bash
+openssl rand -base64 48
+```
+
+Minimum 64 characters. Required when self-hosting; the value in `.env.example`
+is a placeholder and must be replaced.
+
+---
+
+## Database
+
+The Docker Compose stack runs its own PostgreSQL, so no external database is
+needed for local development. Two variables exist because one URL cannot serve
+both cases:
+
+| Variable | Used by | Points at |
+|---|---|---|
+| `DATABASE_URL` | Tooling you run on the host — `npm run db:migrate`, Prisma CLI | `localhost:5434` (the published port) |
+| `DATABASE_URL_DOCKER` | The backend and worker containers | `postgres:5432` (the compose service) |
+
+`localhost` is not resolvable from inside the compose network, which is why they
+are separate. Leave `DATABASE_URL_DOCKER` unset to use the bundled database; set
+it to point at an external PostgreSQL instance instead.
+
+### Redis
+
+The compose stack runs Redis 7, but no code path reads it yet. The BullMQ queue
+integration is tracked in [ROADMAP.md](ROADMAP.md) (P1). An external instance
+such as Upstash can be supplied via `REDIS_URL` in the meantime.
+
+---
+
+## Feature flags
+
+| Flag | Default | Effect |
+|---|---|---|
+| `ENABLE_SIGNUPS` | `true` | Allows new account creation |
+| `ENABLE_EMAILS` | `false` | Sends alert and verification email. Also requires `RESEND_API_KEY` |
+| `ENABLE_BILLING` | `false` | Enables Stripe checkout. Also requires `STRIPE_SECRET_KEY` |
+
+Setting a flag without its API keys logs a warning at startup and leaves the
+feature disabled rather than failing. See `backend/src/config/env.ts`.
+
+There are deliberately no `ENABLE_WORKSPACES` or `ENABLE_TEAMS` flags. Those
+features are not implemented, and a flag implying otherwise is the kind of
+over-claim this project tries to avoid.
+
+---
+
+## Keeping secrets out of images
+
+`.dockerignore` excludes `.env` at the repository root, `backend/`, and
+`frontend/`. Without those files, `COPY . .` in the Dockerfiles would copy your
+real `.env` — database password, Supabase service-role key, Stripe and Resend
+secrets — into an image layer and ship it to any registry that image is pushed
+to. Do not remove those exclusions.
+
+Verify after any Dockerfile change:
+
+```bash
+docker run --rm --entrypoint sh <image> -c 'test -f /app/.env && echo LEAK || echo clean'
+```

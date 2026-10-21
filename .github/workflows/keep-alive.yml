@@ -1,0 +1,27 @@
+name: Keep-Alive
+
+on:
+  schedule:
+    # Every 5 minutes. Render free web services sleep after ~15 min idle;
+    # this inbound traffic keeps the combined API+worker instance awake so
+    # background checks run continuously at $0 cost.
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+jobs:
+  ping:
+    name: Ping /health
+    runs-on: ubuntu-latest
+    steps:
+      - name: Health Check
+        env:
+          BACKEND_URL: ${{ secrets.BACKEND_URL }}
+        run: |
+          URL="${BACKEND_URL:-https://api-monitor-api.onrender.com}/health"
+          CODE=$(curl -s -o /tmp/hc.json -w "%{http_code}" --max-time 30 "$URL")
+          echo "GET $URL -> $CODE"
+          cat /tmp/hc.json; echo
+          if [ "$CODE" != "200" ]; then
+            echo "::error title=Health check failed::Backend returned $CODE"
+            exit 1
+          fi

@@ -1,0 +1,68 @@
+# Render Blueprint — api-monitor-saas combined backend + worker (free web service)
+#
+# Import this repo in Render (Blueprints / "New +") to create the service
+# automatically. Render builds the root `Dockerfile` (API + worker in one
+# container) and serves it on a free `https://<service>.onrender.com` URL.
+#
+# Keep-alive: Render free web services sleep after ~15 min without inbound
+# traffic. `.github/workflows/keep-alive.yml` pings /health every 5 minutes
+# so checks keep running at $0 cost.
+#
+# Required env vars (set in Render dashboard after import, or via sync:false
+# prompts below): DATABASE_URL, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY,
+# JWT_SECRET, FRONTEND_URL, STRIPE_* , RESEND_API_KEY, FROM_EMAIL, REDIS_URL.
+
+services:
+  - type: web
+    name: api-monitor-api
+    runtime: docker
+    repo: https://github.com/dsk-dev-ai/api-monitor-saas
+    branch: main
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    autoDeploy: false
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3001
+      - key: FRONTEND_URL
+        sync: false # https://<your-vercel-domain>
+      - key: DATABASE_URL
+        sync: false # postgres URL from free hosted Supabase
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: REDIS_URL
+        sync: false # free Upstash Redis
+      - key: STRIPE_SECRET_KEY
+        sync: false # test keys first
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: STRIPE_PRICE_BASIC
+        sync: false
+      - key: STRIPE_PRICE_PRO
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: FROM_EMAIL
+        sync: false
+      - key: ENABLE_EMAILS
+        value: "true"
+      - key: ENABLE_BILLING
+        value: "true"
+      - key: ENABLE_SIGNUPS
+        value: "true"
+      - key: ENABLE_WORKSPACES
+        value: "true"
+      - key: ENABLE_TEAMS
+        value: "true"
+      - key: CHECK_INTERVAL_SECONDS
+        value: "30"
+      - key: CLEANUP_DAYS
+        value: "90"

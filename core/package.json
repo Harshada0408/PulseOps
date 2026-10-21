@@ -1,0 +1,38 @@
+{
+  "name": "@pulseops/core",
+  "version": "1.0.0",
+  "description": "PulseOps core: hardened HTTP check executor, SSRF policy, incident state machine, simulation fixtures",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src",
+    "test": "jest",
+    "test:ci": "jest --runInBand"
+  },
+  "dependencies": {
+    "@prisma/client": "5.22.0",
+    "axios": "^1.6.2",
+    "pg": "^8.23.1",
+    "winston": "^3.11.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.0",
+    "@types/jest": "^29.5.11",
+    "@types/node": "^20.10.4",
+    "@types/pg": "^8.23.1",
+    "@typescript-eslint/eslint-plugin": "^8.62.0",
+    "@typescript-eslint/parser": "^8.62.0",
+    "dotenv": "^16.6.1",
+    "eslint": "^10.5.0",
+    "globals": "^15.15.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.1",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}

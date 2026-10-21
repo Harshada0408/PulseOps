@@ -1,0 +1,54 @@
+name: Deploy Production
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Deploy to Production
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          DEPLOY_REF: ${{ github.sha }}
+        run: |
+          ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST << EOF
+            cd /opt/api-monitor
+            git fetch --tags
+            git checkout "$DEPLOY_REF"
+
+            # Update environment
+            echo "${{ secrets.ENV_FILE }}" > .env
+
+            # Build and deploy
+            docker compose -f docker-compose.prod.yml down
+            docker compose -f docker-compose.prod.yml pull
+            docker compose -f docker-compose.prod.yml up -d --build
+
+            # Run migrations
+            docker compose -f docker-compose.prod.yml exec -T backend npx prisma migrate deploy
+
+            # Health check
+            sleep 10
+            curl -f http://localhost:3001/health || exit 1
+
+            # Cleanup
+            docker system prune -f
+          EOF
+
+      - name: Notify Deployment
+        if: always()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          text: 'API Monitor deployment ${{ job.status }}'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

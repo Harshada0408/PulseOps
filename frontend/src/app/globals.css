@@ -1,0 +1,207 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light;
+    --background: 210 25% 97%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 217 91% 48%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 214 25% 93%;
+    --secondary-foreground: 222 47% 14%;
+    --muted: 214 25% 94%;
+    --muted-foreground: 215 16% 38%;
+    --accent: 214 30% 92%;
+    --accent-foreground: 222 47% 14%;
+    --destructive: 0 72% 46%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 152 62% 30%;
+    --success-foreground: 0 0% 100%;
+    --warning: 32 92% 36%;
+    --warning-foreground: 0 0% 100%;
+    --border: 214 22% 86%;
+    --input: 214 22% 82%;
+    --ring: 217 91% 48%;
+    --radius: 0.625rem;
+    --gradient-brand: linear-gradient(135deg, hsl(217 91% 48%), hsl(217 91% 40%));
+    /* status colours (text/foreground use) and chart series */
+    --ok: 152 62% 28%;
+    --warn: 32 92% 34%;
+    --bad: 0 72% 44%;
+    --idle: 215 14% 40%;
+    --sim: 268 60% 44%;
+    --chart-1: 217 91% 48%;
+    --chart-2: 32 92% 40%;
+    --chart-3: 0 72% 46%;
+    --chart-grid: 214 22% 88%;
+  }
+
+  .dark {
+    color-scheme: dark;
+    --background: 224 40% 7%;
+    --foreground: 214 32% 94%;
+    --card: 224 33% 10%;
+    --card-foreground: 214 32% 94%;
+    --popover: 224 34% 11%;
+    --popover-foreground: 214 32% 94%;
+    --primary: 217 91% 64%;
+    --primary-foreground: 224 45% 8%;
+    --secondary: 223 28% 15%;
+    --secondary-foreground: 214 32% 92%;
+    --muted: 223 28% 14%;
+    --muted-foreground: 215 18% 70%;
+    --accent: 223 28% 17%;
+    --accent-foreground: 214 32% 94%;
+    --destructive: 0 78% 62%;
+    --destructive-foreground: 224 45% 8%;
+    --success: 152 60% 48%;
+    --success-foreground: 224 45% 8%;
+    --warning: 38 92% 56%;
+    --warning-foreground: 224 45% 8%;
+    --border: 222 25% 20%;
+    --input: 222 25% 24%;
+    --ring: 217 91% 64%;
+    --radius: 0.625rem;
+    --gradient-brand: linear-gradient(135deg, hsl(217 91% 64%), hsl(217 91% 54%));
+    --ok: 152 60% 52%;
+    --warn: 38 92% 58%;
+    --bad: 0 80% 66%;
+    --idle: 215 16% 66%;
+    --sim: 268 80% 76%;
+    --chart-1: 217 91% 64%;
+    --chart-2: 38 92% 58%;
+    --chart-3: 0 80% 66%;
+    --chart-grid: 222 25% 20%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: 'rlig' 1, 'calt' 1;
+  }
+
+  ::selection {
+    background: hsl(var(--primary) / 0.3);
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    background: var(--gradient-brand);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .bg-gradient-brand {
+    background: var(--gradient-brand);
+  }
+
+  .bg-grid {
+    background-image:
+      linear-gradient(to right, hsl(var(--foreground) / 0.04) 1px, transparent 1px),
+      linear-gradient(to bottom, hsl(var(--foreground) / 0.04) 1px, transparent 1px);
+    background-size: 56px 56px;
+  }
+
+  .bg-dots {
+    background-image: radial-gradient(hsl(var(--foreground) / 0.08) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  .glass {
+    background: hsl(var(--card) / 0.6);
+    backdrop-filter: blur(16px) saturate(140%);
+    -webkit-backdrop-filter: blur(16px) saturate(140%);
+    border: 1px solid hsl(var(--border) / 0.6);
+  }
+
+  .glow-brand {
+    box-shadow: 0 0 40px -8px hsl(var(--primary) / 0.5);
+  }
+
+  .glow-soft {
+    box-shadow: 0 20px 60px -20px hsl(var(--primary) / 0.35);
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .animate-float-slow {
+    animation: float 9s ease-in-out infinite;
+  }
+
+  .animate-shimmer {
+    background: linear-gradient(
+      110deg,
+      hsl(var(--muted) / 0.6) 8%,
+      hsl(var(--muted) / 1) 18%,
+      hsl(var(--muted) / 0.6) 33%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.6s linear infinite;
+  }
+
+  .animate-pulse-dot {
+    animation: pulse-dot 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes pulse-dot {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 hsl(var(--success) / 0.5);
+  }
+  50% {
+    opacity: 0.85;
+    box-shadow: 0 0 0 6px hsl(var(--success) / 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
