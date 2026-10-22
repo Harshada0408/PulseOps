@@ -53,27 +53,9 @@ TypeScript everywhere · Next.js 14 (App Router) + Tailwind + Recharts · Expres
 
 ## Architecture
 
-```mermaid
-flowchart LR
-  UI[Next.js UI] -->|REST /api/v1| API[Express API]
-  API --> SVC[Services: monitors, incidents, dashboard, simulation, AI]
-  SVC --> CORE
-  W[Worker: scheduler] --> CORE
-  subgraph CORE[@pulseops/core]
-    EXE[Hardened executor + SSRF policy]
-    ENG[Incident engine: state machine]
-    EXP[Explanation + timeline builder]
-    SIM[Simulation fixtures]
-  end
-  EXE -->|outbound HTTP, validated| T[(Monitored APIs)]
-  ENG -->|one transaction per observation| PG[(PostgreSQL)]
-  SVC --> PG
-  API -.optional.-> AI[AI provider adapter]
-```
+PulseOps follows a modular architecture with a frontend dashboard, backend API, monitoring and incident-management logic, and a PostgreSQL database for storing monitor configurations, response-time metrics, and incident records.
 
-Request flow of one check: scheduler (or `POST /monitors/:id/check`) → executor performs the request after SSRF validation → `recordObservation()` opens a transaction, **locks the monitor row** (`SELECT … FOR UPDATE`), inserts the check, updates the four counters, opens/continues/resolves incidents and writes evidence → commit.
-
-Repository layout: `core/` shared engine · `backend/` REST API · `worker/` scheduler · `frontend/` UI · `backend/prisma/` schema + migrations · `docs/` documentation.
+The backend processes monitoring data, calculates latency statistics (P50, P75, P90, P95, and P99), and supports incident investigation workflows.
 
 ## Incident state machine
 
