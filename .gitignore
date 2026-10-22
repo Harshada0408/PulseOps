@@ -37,8 +37,7 @@ Thumbs.db
 *.db
 *.sqlite
 
-# .dockerignore files ARE committed — they control the Docker build context and are
-# what keeps .env and host node_modules out of published images. Do not ignore them.
+
 
 # Coverage
 coverage/

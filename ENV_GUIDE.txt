@@ -72,26 +72,16 @@ is a placeholder and must be replaced.
 
 ---
 
+
 ## Database
 
-The Docker Compose stack runs its own PostgreSQL, so no external database is
-needed for local development. Two variables exist because one URL cannot serve
-both cases:
+PulseOps uses PostgreSQL as its database. Ensure PostgreSQL is running locally and configure `DATABASE_URL` in your `.env` file with the correct connection string.
 
-| Variable | Used by | Points at |
-|---|---|---|
-| `DATABASE_URL` | Tooling you run on the host — `npm run db:migrate`, Prisma CLI | `localhost:5434` (the published port) |
-| `DATABASE_URL_DOCKER` | The backend and worker containers | `postgres:5432` (the compose service) |
+The `DATABASE_URL` variable is used by the backend and database tooling, including Prisma migrations. Make sure the database name, username, password, host, and port match your local PostgreSQL configuration.
 
-`localhost` is not resolvable from inside the compose network, which is why they
-are separate. Leave `DATABASE_URL_DOCKER` unset to use the bundled database; set
-it to point at an external PostgreSQL instance instead.
+## Redis
 
-### Redis
-
-The compose stack runs Redis 7, but no code path reads it yet. The BullMQ queue
-integration is tracked in [ROADMAP.md](ROADMAP.md) (P1). An external instance
-such as Upstash can be supplied via `REDIS_URL` in the meantime.
+Redis integration is not currently used by the application's active code paths. If you configure an external Redis instance for future development, provide its connection string through `REDIS_URL`.
 
 ---
 
@@ -111,17 +101,3 @@ features are not implemented, and a flag implying otherwise is the kind of
 over-claim this project tries to avoid.
 
 ---
-
-## Keeping secrets out of images
-
-`.dockerignore` excludes `.env` at the repository root, `backend/`, and
-`frontend/`. Without those files, `COPY . .` in the Dockerfiles would copy your
-real `.env` — database password, Supabase service-role key, Stripe and Resend
-secrets — into an image layer and ship it to any registry that image is pushed
-to. Do not remove those exclusions.
-
-Verify after any Dockerfile change:
-
-```bash
-docker run --rm --entrypoint sh <image> -c 'test -f /app/.env && echo LEAK || echo clean'
-```

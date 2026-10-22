@@ -32,7 +32,7 @@ What actually happened. Include error messages, stack traces, or screenshots.
 - Node version: (e.g. 22.x)
 - Docker version: (if applicable)
 - Browser: (if frontend issue, e.g. Chrome 120)
-- Deployment: (e.g. Docker Compose, manual, Render/Vercel)
+
 
 ## Additional context
 
