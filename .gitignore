@@ -21,7 +21,7 @@ logs/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-backup-auth-fix/
+backup-auth-fix/git add .
 
 # IDE
 .vscode/
@@ -65,3 +65,4 @@ PROJECT_REPORT.md
 *.backup
 .backup
 release-evidence/videos/
+backup-auth-fix/
